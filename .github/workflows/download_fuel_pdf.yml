@@ -6,7 +6,7 @@ on:
   workflow_dispatch:       # manual trigger
 
 jobs:
-  download:
+  download_and_merge:
     runs-on: ubuntu-latest
     steps:
       
@@ -23,17 +23,20 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4
+          pip install requests beautifulsoup4 pdfplumber pandas openpyxl
       
       - name: Run downloader script
         run: python code_for_download.py
 
-      - name: Commit and push if new PDF
+      - name: Merge PDF data into XLSX
+        run: python merge_to_file.py
+
+      - name: Commit and push updated XLSX
         env:
           GH_PAT: ${{ secrets.FUEL_PAT }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          git add pdf_files/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update fuel PDFs"
+          git add "prices_of_petrol.xlsx"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update petrol prices XLSX"
           git push https://$GH_PAT@github.com/Nik2014/fuel_prices.git main

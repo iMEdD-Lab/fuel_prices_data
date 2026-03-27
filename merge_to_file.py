@@ -83,13 +83,45 @@ def extract_data_from_pdf(pdf_path):
         data_dict.setdefault(col, None)
 
     # Create a single-row DataFrame with proper column order
-    df = pd.DataFrame([data_dict], columns=["date"] + list(FUEL_MAP.values()))
-    return df
+    new_row_df = pd.DataFrame([data_dict], columns=["date"] + list(FUEL_MAP.values()))
+    return new_row_df
 
 # Main
 if __name__ == "__main__":
     latest_pdf, pdf_date = get_latest_pdf(PDF_FOLDER)
-    df = extract_data_from_pdf(latest_pdf)
-    print("first step ok!")
+    new_row_df = extract_data_from_pdf(latest_pdf)
     
 
+# ----------------
+# Merge the data with the master .xlsx
+# ----------------
+
+# Paths
+master_xlsx = "/workspaces/fuel_prices/prices_of_petrol.xlsx"
+
+# Read master XLSX
+master_df = pd.read_excel(master_xlsx)
+
+# Ensure master dates are datetime, then convert to dd-mm-yy strings
+master_df["date"] = pd.to_datetime(master_df["date"], errors="coerce", dayfirst=True)
+master_df = master_df.dropna(subset=["date"])
+master_df["date"] = master_df["date"].dt.strftime("%d-%m-%y")
+
+# Ensure new row date is also in dd-mm-yy string format
+new_row_df["date"] = pd.to_datetime(new_row_df["date"], format="%d/%m/%y", errors="coerce")
+new_row_df["date"] = new_row_df["date"].dt.strftime("%d-%m-%y")
+
+# Check for duplicates
+if new_row_df.iloc[0]["date"] in master_df["date"].values:
+    print(f"Date {new_row_df.iloc[0]['date']} already exists. Skipping append.")
+else:
+    # Append new row at the bottom
+    master_df = pd.concat([master_df, new_row_df], ignore_index=True)
+
+# Ensure correct column order
+master_df = master_df[["date", "diesel_driving", "unleaded_100", "unleaded_95", "autogas"]]
+
+# Save back to XLSX
+master_df.to_excel(master_xlsx, index=False, engine="openpyxl")
+
+print(f"Updated {master_xlsx} with latest data.")
