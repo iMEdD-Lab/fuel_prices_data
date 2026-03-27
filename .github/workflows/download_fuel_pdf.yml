@@ -33,4 +33,4 @@ jobs:
           git config --global user.email "actions@github.com"
           git add pdf_files/
           git diff --quiet && git diff --staged --quiet || git commit -m "Update fuel PDFs"
-          git push https://$GH_PAT@github.com/Nik2014/fuel_prices.git main
+          git push https://$FUEL_PAT@github.com/Nik2014/fuel_prices.git main
