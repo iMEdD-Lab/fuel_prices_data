@@ -2,53 +2,48 @@ name: Download and Merge Fuel Data
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # daily at 06:00 UTC
-  workflow_dispatch:       # manual trigger
+    - cron: "0 6 * * *"
+  workflow_dispatch:
 
 jobs:
   download-and-merge:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the repository so we have all files (including the XLSX)
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # Important to use personal access token later
+          persist-credentials: false
 
-      # 2️⃣ Set up Python 3.12
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4 pdfplumber pandas openpyxl
 
-      # 4️⃣ Run downloader script to fetch latest PDFs
       - name: Run downloader script
         run: python code_for_download.py
 
-      # 5️⃣ Run merge script to update the master XLSX
       - name: Merge latest PDF data into XLSX
         run: python merge_to_file.py
 
-      # 6️⃣ Commit any changes (PDFs and updated XLSX) back to GitHub
+      # ✅ NEW STEP
+      - name: Generate prefecture CSV
+        run: python pref_today.py
+
       - name: Commit and push changes
         env:
           GH_PAT: ${{ secrets.FUEL_PAT }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
-          
-          # Stage all relevant files
-          git add pdf_files/ prices_of_petrol.xlsx prices_of_petrol.csv
-          
-          # Commit only if there are changes, but don't fail if nothing to commit
-          git commit -m "Update fuel PDFs, XLSX, and CSV" || echo "No changes to commit"
-          
-          # Push to main
+
+          git add pdf_files/ prices_of_petrol.xlsx prices_of_petrol.csv pref_latest.csv
+
+          git commit -m "Update fuel data (national + prefecture)" || echo "No changes to commit"
+
           git push https://$GH_PAT@github.com/Nik2014/fuel_prices.git main
