@@ -213,36 +213,3 @@ if __name__ == "__main__":
     # Save updated master CSV without the old index
     combined_df.to_csv("master_pref_upd.csv", index=False)
 
-    # ----------------
-    # Update local files
-    # ----------------
-    # Ensure the output folder exists
-    output_folder = "local_prices"
-    os.makedirs(output_folder, exist_ok=True)
-
-    # Assume combined_df already exists and has a 'prefecture' column
-    for prefecture, group_df in combined_df.groupby("prefecture"):
-        # Skip prefectures with numbers in their name
-        if re.search(r'\d', prefecture):
-            continue
-
-        # Clean prefecture name to make it a safe filename
-        safe_name = prefecture.replace(" ", "_").replace("/", "_")
-        file_path = os.path.join(output_folder, f"{safe_name}_pr.csv")
-        
-        # Save CSV for this prefecture without the old index
-        group_df.to_csv(file_path, index=False)    
-        # Drop "Unnamed: 0" if it exists
-        local_folder = "local_prices"
-
-    for file in os.listdir(local_folder):
-        if not file.endswith(".csv"):
-            continue
-
-        path = os.path.join(local_folder, file)
-        df = pd.read_csv(path)
-
-        # Drop "Unnamed: 0" if it exists
-        if "Unnamed: 0" in df.columns:
-            df = df.drop(columns=["Unnamed: 0"])
-            df.to_csv(path, index=False) 
