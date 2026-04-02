@@ -18,7 +18,7 @@ os.environ["DATAWRAPPER_ACCESS_TOKEN"] = API_KEY
 # -----------------------
 # LOAD CHART MAPPINGS
 # -----------------------
-CHART_CONFIG_FILE = "ids/chart_config.json"
+CHART_CONFIG_FILE = "datawrapper_api/ids/chart_config.json"
 if not Path(CHART_CONFIG_FILE).exists():
     raise FileNotFoundError(f"{CHART_CONFIG_FILE} does not exist!")
 
