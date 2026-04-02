@@ -25,7 +25,7 @@ if not Path(CHART_CONFIG_FILE).exists():
 with open(CHART_CONFIG_FILE, "r", encoding="utf-8") as f:
     chart_mappings = json.load(f)
 
-CSV_URL = "https://raw.githubusercontent.com/pmethodios/fuel_prices/main/master_pref_upd.csv"
+CSV_URL = "https://raw.githubusercontent.com/pmethodios/fuel_prices/refs/heads/main/prefectures/update_master/master_pref_upd.csv"
 
 # -----------------------
 # DEFINE COLORS PER FUEL TYPE
