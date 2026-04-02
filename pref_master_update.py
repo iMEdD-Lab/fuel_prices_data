@@ -198,18 +198,38 @@ if __name__ == "__main__":
 
     df = build_prefecture_df_for_master()
 
-    print(df.head())
     print(f"Total rows: {len(df)}")
 
-    # Load existing master CSV
-    master_df = pd.read_csv("master_pref_old.csv", parse_dates=["date"], dayfirst=True)
+    master_df = pd.read_csv("master_pref_old.csv", index_col=False)
 
-    # Concatenate and clean
+    # Strip whitespace from column names
+    master_df.columns = master_df.columns.str.strip()
+
+    # Parse old CSV dates explicitly: YYYY-MM-DD
+    master_df['date'] = pd.to_datetime(master_df['date'], format="%Y-%m-%d", errors='coerce')
+
+    # --- New PDF-derived df ---
+    # Dates from PDF are in D/M/YY format, e.g., 26/3/26
+    df['date'] = pd.to_datetime(df['date'], format="%d/%m/%y", errors='coerce')    # Drop wrong column in old df
+   
+    # Delete first column of old df
+    if "Unnamed: 0" in master_df.columns:
+        master_df = master_df.drop(columns=["Unnamed: 0"])
+
+
+    # Ensure numeric columns are floats
+    #NUMERIC_COLS = ["Αμόλυβδη 95", "Αμόλυβδη 100", "Diesel Κίνησης", "Autogas", "Diesel Θέρμανσης", "Super"]
+    #for col in NUMERIC_COLS:
+    #    master_df[col] = pd.to_numeric(master_df[col], errors='coerce')
+    #    df[col] = pd.to_numeric(df[col], errors='coerce')
+    # Concatenate
     combined_df = pd.concat([master_df, df], ignore_index=True)
-    combined_df = combined_df.sort_values(["date", "prefecture"])
-    combined_df = combined_df.drop_duplicates(subset=["date", "prefecture"], keep="last")
-    combined_df = combined_df.sort_values("date").reset_index(drop=True)
 
-    # Save updated master CSV without the old index
-    combined_df.to_csv("master_pref_upd.csv", index=False)
+    # Remove duplicates, keep last
+    combined_df = combined_df.drop_duplicates(subset=['date', 'prefecture'], keep='last')
 
+    # Sort by date ascending
+    combined_df = combined_df.sort_values(['date', 'prefecture'], ascending=[True, True]).reset_index(drop=True)
+
+    # Save CSV
+    combined_df.to_csv("master_pref_upd.csv", index=False, date_format="%Y-%m-%d")    

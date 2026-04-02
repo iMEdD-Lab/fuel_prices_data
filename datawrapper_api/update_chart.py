@@ -74,8 +74,10 @@ for chart_info in chart_mappings:
     # CALCULATE PER-FUEL MIN VALUE FOR Y-AXIS
     # -----------------------
     min_val = df_chart[fuel_type].min()
-    lower_y = math.floor(min_val / 0.15) * 0.15  # round down to nearest 0.15
 
+    # Second closest lower tenth
+    lower_y = math.floor(min_val * 10) / 10 - 0.1
+    lower_y = max(lower_y, 0)
     # -----------------------
     # ASSIGN COLOR
     # -----------------------
@@ -114,15 +116,15 @@ for chart_info in chart_mappings:
     # -----------------------
     # EXPORT PNG LOCALLY
     # -----------------------
-    png_safe_pref = prefecture.replace(" ", "_").replace("ΝΟΜΟΣ_", "")
-    png_safe_fuel = fuel_type.replace(" ", "_")
-    png_filename = f"fuel_prices_{png_safe_pref}_{png_safe_fuel}.png"
+    #png_safe_pref = prefecture.replace(" ", "_").replace("ΝΟΜΟΣ_", "")
+    #png_safe_fuel = fuel_type.replace(" ", "_")
+    #png_filename = f"fuel_prices_{png_safe_pref}_{png_safe_fuel}.png"
 
-    Path("./temp_images").mkdir(parents=True, exist_ok=True)
-    local_png_path = Path("./temp_images") / png_filename
-    png_data = chart.export_png()
-    with open(local_png_path, "wb") as f:
-        f.write(png_data)
+    #Path("./temp_images").mkdir(parents=True, exist_ok=True)
+    #local_png_path = Path("./temp_images") / png_filename
+    #png_data = chart.export_png()
+    #with open(local_png_path, "wb") as f:
+    #    f.write(png_data)
 
-    print(f"PNG saved locally: {local_png_path}")
-    time.sleep(0.5)
+    #print(f"PNG saved locally: {local_png_path}")
+    #time.sleep(0.5)
