@@ -26,17 +26,17 @@ jobs:
           pip install requests beautifulsoup4 pdfplumber pandas openpyxl datawrapper
 
       - name: Run downloader script
-        run: python code_for_download.py
+        run: python national/code_for_download.py
 
       - name: Merge latest PDF data into XLSX
-        run: python merge_to_file.py
+        run: python national/merge_to_file.py
 
       - name: Generate prefecture CSV
-        run: python pref_today.py
+        run: python prefectures/latest_only/pref_today.py
+      
+      - name: Update the prefecture data CSV
+        run: python prefectures/update_master/pref_master_update.py
 
-      # -----------------------
-      # NEW STEP: Update Datawrapper charts
-      # -----------------------
       - name: Update Datawrapper Charts and Export PNGs
         run: python datawrapper_api/update_chart.py
         env:
