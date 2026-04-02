@@ -200,7 +200,7 @@ if __name__ == "__main__":
 
     print(f"Total rows: {len(df)}")
 
-    master_df = pd.read_csv("master_pref_old.csv", index_col=False)
+    master_df = pd.read_csv("fuel_prices/prefectures/update_master/master_pref_old.csv", index_col=False)
 
     # Strip whitespace from column names
     master_df.columns = master_df.columns.str.strip()
