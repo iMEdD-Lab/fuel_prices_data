@@ -18,7 +18,7 @@ os.environ["DATAWRAPPER_ACCESS_TOKEN"] = API_KEY
 # -----------------------
 # LOAD CHART MAPPINGS
 # -----------------------
-CHART_CONFIG_FILE = "datawrapper_api/ids/chart_config.json"
+CHART_CONFIG_FILE = "ids/chart_config.json"
 if not Path(CHART_CONFIG_FILE).exists():
     raise FileNotFoundError(f"{CHART_CONFIG_FILE} does not exist!")
 
@@ -128,3 +128,44 @@ for chart_info in chart_mappings:
 
     print(f"PNG saved locally: {local_png_path}")
     time.sleep(0.5)
+
+
+    # Debug issue of not creating pngs for certain areas
+
+    updated_charts = []
+    created_pngs = []
+
+    for chart_info in chart_mappings:
+        chart_id = chart_info["chart_id"]
+        prefecture = chart_info["prefecture"]
+        fuel_type = chart_info["fuel_type"]
+
+        # Expected PNG filename
+        png_safe_pref = prefecture.replace(" ", "_").replace("ΝΟΜΟΣ_", "")
+        png_safe_fuel = fuel_type.replace(" ", "_")
+        png_filename = f"fuel_prices_{png_safe_pref}_{png_safe_fuel}.png"
+
+        # Check if chart was updated
+        if Path(f"./temp_images/{png_filename}").exists():
+            updated_charts.append(f"{prefecture} - {fuel_type}")
+            created_pngs.append(png_filename)
+
+# Determine missing charts
+all_charts = [f"{c['prefecture']} - {c['fuel_type']}" for c in chart_mappings]
+missing_charts = set(all_charts) - set(updated_charts)
+missing_pngs = set([f"fuel_prices_{c['prefecture'].replace(' ', '_').replace('ΝΟΜΟΣ_', '')}_{c['fuel_type'].replace(' ', '_')}.png" for c in chart_mappings]) - set(created_pngs)
+
+print("\n--- REPORT ---")
+if missing_charts:
+    print("Charts NOT updated:")
+    for c in sorted(missing_charts):
+        print("❌", c)
+else:
+    print("All charts updated ✅")
+
+if missing_pngs:
+    print("\nPNGs NOT created:")
+    for p in sorted(missing_pngs):
+        print("❌", p)
+else:
+    print("All PNGs created ✅")
