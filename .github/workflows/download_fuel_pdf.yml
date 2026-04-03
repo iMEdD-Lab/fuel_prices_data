@@ -70,7 +70,6 @@ jobs:
 
           git add \
             national/pdf_files/ \
-            national/prices_of_petrol.xlsx \
             national/prices_of_petrol.csv \
             prefectures/latest_only/pref_latest.csv \
             prefectures/update_master/master_pref_upd.csv \
