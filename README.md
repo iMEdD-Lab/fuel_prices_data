@@ -1,5 +1,5 @@
 # Greek Fuel Prices Observatory Tracker
-A data pipeline that utilizes python and github actions to automatically downloads the prices of fuel that are uploaded on the website of the Greek ministry of Development. It downloads the pdf files using python, scrapes the tables and updates a .csv file that contains the entire dataset from 2017. 
+The data files of a pipeline that utilizes Python and Github Actions to download the latest data from the observatory of liquid fuel prices of the Greek Ministry of Development. In this repo are stored the .csv files that are updated via a private repo with the latest price averages for four different types of fuel. 
 
 Fuel types that are tracked:
 1. Diesel
